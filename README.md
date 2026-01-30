@@ -77,7 +77,9 @@ Response:
 {"status": "healthy"}
 ```
 
-### List Items
+### Items CRUD
+
+#### List All Items
 
 ```
 GET /items
@@ -93,6 +95,53 @@ Response:
   ]
 }
 ```
+
+#### Get Single Item
+
+```
+GET /items/{id}
+```
+
+Response:
+```json
+{"id": 1, "name": "Apple"}
+```
+
+#### Create Item
+
+```
+POST /items
+Content-Type: application/json
+
+{"name": "Orange"}
+```
+
+Response (201 Created):
+```json
+{"id": 4, "name": "Orange"}
+```
+
+#### Update Item
+
+```
+PUT /items/{id}
+Content-Type: application/json
+
+{"name": "Updated Name"}
+```
+
+Response:
+```json
+{"id": 1, "name": "Updated Name"}
+```
+
+#### Delete Item
+
+```
+DELETE /items/{id}
+```
+
+Response: 204 No Content
 
 ## Database Migrations
 

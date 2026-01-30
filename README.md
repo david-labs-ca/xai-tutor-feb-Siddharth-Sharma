@@ -26,10 +26,31 @@ A FastAPI backend project with SQLite database using raw SQL queries (no ORM).
 │   └── 001_create_items_table.py
 ├── migrate.py               # Migration runner script
 ├── requirements.txt         # Python dependencies
+├── Dockerfile
+├── docker-compose.yml
 └── README.md
 ```
 
-## Setup
+## Quick Start (Docker)
+
+The easiest way to run the application:
+
+```bash
+docker-compose up --build
+```
+
+This will:
+- Build the Docker image
+- Run database migrations automatically
+- Start the API server at `http://localhost:8000`
+
+To stop the application:
+
+```bash
+docker-compose down
+```
+
+## Manual Setup (Without Docker)
 
 ### 1. Create and activate a virtual environment
 

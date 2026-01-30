@@ -9,6 +9,15 @@
 > **2. Do not raise Pull Request in the original repo**
 > 
 > **3. Application must be runnable with `docker-compose up` command**
+> 
+> **4. Complete as many APIs as possible within the 90-minute time limit**
+> 
+> **5. Prioritize working functionality - do not submit broken code that fails to run with `docker-compose up`**
+
+### Tips
+- Focus on core functionality first, then add features incrementally
+- Test your application with `docker-compose up` before final submission
+- A partially complete but working solution is better than a complete but broken one
 
 ---
 

@@ -1,14 +1,93 @@
-# Backend Exercise API
+# Shopping Cart API - Backend Assessment
+
+**Time Limit: 90 minutes**
+
+## Important Instructions
+
+> **1. Fork this repo into your personal account**
+> 
+> **2. Do not raise Pull Request in the original repo**
+> 
+> **3. Application must be runnable with `docker-compose up` command**
+
+---
 
 A FastAPI backend project with SQLite database using raw SQL queries (no ORM).
 
-## Features
+## Objective
 
-- FastAPI web framework
-- SQLite database with raw SQL queries
-- Database migrations without ORM
-- Health check endpoint
-- Items listing endpoint
+Create a backend for a simple e-commerce shopping cart where users can add items, view their cart, and checkout.
+
+## Functional Requirements
+
+### User Authentication
+- User registration
+- User login with JWT access token
+- Multi-user support (each user has their own cart)
+
+### Cart Management
+- Add products to a cart
+- Update quantity of products
+- Remove products
+- Calculate total price
+
+### Product Catalog (Read-only)
+- List available products with prices
+- Products table should be seeded with sample data on application startup
+
+## Required APIs
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Login and receive JWT access token |
+
+### Products
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/products` | List available products |
+
+### Cart (Protected - requires JWT)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/cart/items` | Add item to cart (payload: `product_id`, `quantity`) |
+| `GET` | `/cart` | View current cart details and total |
+| `PUT` | `/cart/items/{itemId}` | Update quantity |
+| `DELETE` | `/cart/items/{itemId}` | Remove item |
+| `POST` | `/cart/checkout` | "Purchase" items and clear cart |
+
+## Data Models
+
+### Users
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | INTEGER | Primary key, auto-increment |
+| `email` | TEXT | Unique, user's email address |
+| `password` | TEXT | Hashed password |
+
+### Products
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | INTEGER | Primary key, auto-increment |
+| `name` | TEXT | Product name |
+| `price` | REAL | Product price |
+
+### Cart
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | INTEGER | Primary key, auto-increment |
+| `user_id` | INTEGER | Foreign key to Users |
+| `total` | REAL | Total price of cart |
+| `status` | TEXT | Cart status (e.g., "active", "checked_out") |
+
+### CartItems
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | INTEGER | Primary key, auto-increment |
+| `cart_id` | INTEGER | Foreign key to Cart |
+| `product_id` | INTEGER | Foreign key to Products |
+| `quantity` | INTEGER | Quantity of the product |
 
 ## Project Structure
 
@@ -85,179 +164,13 @@ python -m app.main
 
 The API will be available at `http://localhost:8000`
 
-## API Endpoints
+## API Documentation
 
-### Health Check
-
-```
-GET /health
-```
-
-Response:
-```json
-{"status": "healthy"}
-```
-
-### Items CRUD
-
-#### List All Items
-
-```
-GET /items
-```
-
-Response:
-```json
-{
-  "items": [
-    {"id": 1, "name": "Apple"},
-    {"id": 2, "name": "Banana"},
-    {"id": 3, "name": "Cherry"}
-  ]
-}
-```
-
-#### Get Single Item
-
-```
-GET /items/{id}
-```
-
-Response:
-```json
-{"id": 1, "name": "Apple"}
-```
-
-#### Create Item
-
-```
-POST /items
-Content-Type: application/json
-
-{"name": "Orange"}
-```
-
-Response (201 Created):
-```json
-{"id": 4, "name": "Orange"}
-```
-
-#### Update Item
-
-```
-PUT /items/{id}
-Content-Type: application/json
-
-{"name": "Updated Name"}
-```
-
-Response:
-```json
-{"id": 1, "name": "Updated Name"}
-```
-
-#### Delete Item
-
-```
-DELETE /items/{id}
-```
-
-Response: 204 No Content
+Once the server is running, visit:
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## Database Migrations
-
-### Migration File Structure
-
-Migration files are located in the `migrations/` directory and follow this naming convention:
-
-```
-{version}_{description}.py
-```
-
-Example: `001_create_items_table.py`
-
-### Creating a New Migration
-
-1. Create a new file in the `migrations/` directory with the next version number:
-
-```bash
-touch migrations/002_add_description_column.py
-```
-
-2. Use this template for your migration:
-
-```python
-"""
-Migration: Add description column to items
-Version: 002
-Description: Adds a description column to the items table
-"""
-
-import sqlite3
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from app.database import DATABASE_PATH
-
-
-def upgrade():
-    """Apply the migration."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-    
-    # Check if this migration has already been applied
-    cursor.execute("SELECT 1 FROM _migrations WHERE name = ?", ("002_add_description_column",))
-    if cursor.fetchone():
-        print("Migration 002_add_description_column already applied. Skipping.")
-        conn.close()
-        return
-    
-    # Your upgrade SQL here
-    cursor.execute("ALTER TABLE items ADD COLUMN description TEXT")
-    
-    # Record this migration
-    cursor.execute("INSERT INTO _migrations (name) VALUES (?)", ("002_add_description_column",))
-    
-    conn.commit()
-    conn.close()
-    print("Migration 002_add_description_column applied successfully.")
-
-
-def downgrade():
-    """Revert the migration."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-    
-    # SQLite doesn't support DROP COLUMN directly
-    # You would need to recreate the table without the column
-    
-    # Remove migration record
-    cursor.execute("DELETE FROM _migrations WHERE name = ?", ("002_add_description_column",))
-    
-    conn.commit()
-    conn.close()
-    print("Migration 002_add_description_column reverted successfully.")
-
-
-if __name__ == "__main__":
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="Run database migration")
-    parser.add_argument(
-        "action",
-        choices=["upgrade", "downgrade"],
-        help="Migration action to perform"
-    )
-    
-    args = parser.parse_args()
-    
-    if args.action == "upgrade":
-        upgrade()
-    elif args.action == "downgrade":
-        downgrade()
-```
 
 ### Running Migrations
 
@@ -275,15 +188,3 @@ python migrate.py downgrade
 ```bash
 python migrate.py list
 ```
-
-**Run a specific migration:**
-```bash
-python migrations/001_create_items_table.py upgrade
-python migrations/001_create_items_table.py downgrade
-```
-
-## API Documentation
-
-Once the server is running, visit:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`

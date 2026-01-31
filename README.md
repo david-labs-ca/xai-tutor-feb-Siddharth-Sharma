@@ -5,13 +5,13 @@
 ## Important Instructions
 
 > **1. Fork this repo into your personal account**
-> 
+>
 > **2. Do not raise Pull Request in the original repo**
-> 
+>
 > **3. Application must be runnable with `docker-compose up` command**
-> 
+>
 > **4. Complete as many APIs as possible within the 90-minute time limit**
-> 
+>
 > **5. Prioritize working functionality - do not submit broken code that fails to run with `docker-compose up`**
 
 ### Tips
@@ -30,17 +30,20 @@ Create a backend for a simple e-commerce shopping cart where users can add items
 ## Functional Requirements
 
 ### User Authentication
+
 - User registration
 - User login with JWT access token
 - Multi-user support (each user has their own cart)
 
 ### Cart Management
+
 - Add products to a cart
 - Update quantity of products
 - Remove products
 - Calculate total price
 
 ### Product Catalog (Read-only)
+
 - List available products with prices
 - Products table should be seeded with sample data on application startup
 
@@ -128,6 +131,7 @@ docker-compose up --build
 ```
 
 This will:
+
 - Build the Docker image
 - Run database migrations automatically
 - Start the API server at `http://localhost:8000`
@@ -173,9 +177,21 @@ python -m app.main
 
 The API will be available at `http://localhost:8000`
 
+## Running tests
+
+Automated API tests use pytest and a separate test database (`tests/test_app.db`, not committed):
+
+```bash
+pip install -r requirements.txt
+pytest tests/ -v
+```
+
+Tests cover health, auth (register/login), and items (CRUD). The test DB is created and migrated automatically.
+
 ## API Documentation
 
 Once the server is running, visit:
+
 - Swagger UI: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
 
@@ -184,16 +200,19 @@ Once the server is running, visit:
 ### Running Migrations
 
 **Apply all pending migrations:**
+
 ```bash
 python migrate.py upgrade
 ```
 
 **Revert all migrations:**
+
 ```bash
 python migrate.py downgrade
 ```
 
 **List migration status:**
+
 ```bash
 python migrate.py list
 ```
